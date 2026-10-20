@@ -34,7 +34,7 @@ export function Layout() {
   const isClientPath = loc.pathname.startsWith("/c");
   const [more, setMore] = useState(false);
 
-  useEffect(() => scrollTo(0, 0), [loc.pathname]);
+  useEffect(() => { scrollTo(0, 0); }, [loc.pathname]);
 
   // l'URL comanda: aprire un link dell'area cliente attiva il ruolo cliente
   useEffect(() => {
