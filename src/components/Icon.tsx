@@ -16,6 +16,7 @@ const P: Record<string, string> = {
   trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
   copy: "M9 9h11v11H9zM5 15H4V4h11v1",
   back: "M15 18l-6-6 6-6",
+  forward: "M9 6l6 6-6 6",
   check: "M5 12.5l4.5 4.5L19 7",
   printer: "M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z",
   skip: "M5 4.5v15l10-7.5zM19 5v14",

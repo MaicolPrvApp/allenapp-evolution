@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Anamnesis, AppData, Appointment, Assessment, Client, Exercise, Food, ID, MealPlan, Message, Plan, WorkoutLog } from "./types";
-import { createExtras, createSeed } from "./seed";
+import type { Anamnesis, AppData, Appointment, Assessment, Client, Exercise, Food, FoodLog, ID, MealPlan, Message, Plan, WorkoutLog } from "./types";
+import { createExtras, createFoodLogs, createSeed } from "./seed";
 import { LIBRARY } from "./exerciseLibrary";
 import { nowIso, uid } from "../lib/util";
 
@@ -22,6 +22,7 @@ type Collections = {
   appointments: Appointment;
   foods: Food;
   mealPlans: MealPlan;
+  foodLogs: FoodLog;
   messages: Message;
 };
 type CollName = keyof Collections;
@@ -79,6 +80,7 @@ export const useStore = create<Store>()(
           anamneses: s.anamneses.filter((a) => a.clientId !== id),
           appointments: s.appointments.filter((a) => a.clientId !== id),
           mealPlans: s.mealPlans.filter((p) => p.clientId !== id),
+          foodLogs: s.foodLogs.filter((f) => f.clientId !== id),
           messages: s.messages.filter((m) => m.clientId !== id),
           meId: s.meId === id ? null : s.meId,
         })),
@@ -135,13 +137,13 @@ export const useStore = create<Store>()(
 
       resetDemo: () => set({ ...createSeed(), meId: null }),
       importData: (d) => {
-        const empty = { assessments: [], anamneses: [], appointments: [], foods: createSeed().foods, mealPlans: [], messages: [] };
-        set({ ...empty, ...d, version: 3, meId: null });
+        const empty = { assessments: [], anamneses: [], appointments: [], foods: createSeed().foods, mealPlans: [], foodLogs: [], messages: [] };
+        set({ ...empty, ...d, version: 4, meId: null });
       },
     }),
     {
       name: "kinetika-data",
-      version: 3,
+      version: 4,
       // la versione 1 non aveva valutazioni, agenda, alimentazione e messaggi: li aggiunge con dati di esempio
       migrate: (state, from) => {
         const s = state as Store;
@@ -154,6 +156,10 @@ export const useStore = create<Store>()(
           const have = new Set((s.exercises ?? []).map((e) => e.id));
           s.exercises = [...(s.exercises ?? []), ...LIBRARY.filter((e) => !have.has(e.id))];
         }
+        if (from < 4) {
+          // diario alimentare: nuovo, con qualche giorno di esempio per i clienti che hanno un piano
+          s.foodLogs = createFoodLogs(s.mealPlans ?? []);
+        }
         return s;
       },
     }
@@ -162,6 +168,6 @@ export const useStore = create<Store>()(
 
 /** Esporta solo i dati (senza azioni né stato dell'interfaccia) */
 export function exportData(): AppData {
-  const { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, messages } = useStore.getState();
-  return { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, messages };
+  const { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, foodLogs, messages } = useStore.getState();
+  return { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, foodLogs, messages };
 }

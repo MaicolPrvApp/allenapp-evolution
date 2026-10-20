@@ -1,6 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "../../data/store";
 import { MacroSummary } from "../../components/MacroSummary";
+import { FoodDiary } from "../../components/FoodDiary";
+import { Tabs } from "../../components/ui";
 import { itemMacros, mealMacros, planMacros } from "../../lib/nutrition";
 import { useMe } from "./useMe";
 
@@ -9,13 +11,15 @@ export function ClientMeals() {
   const me = useMe();
   const { mealPlans, foods } = useStore();
   const foodMap = useMemo(() => new Map(foods.map((f) => [f.id, f])), [foods]);
+  const [tab, setTab] = useState<"diario" | "piano">("diario");
   if (!me) return <p className="empty">Non ci sono ancora clienti.</p>;
   const plan = mealPlans.filter((p) => p.clientId === me.id && p.active).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
   return (
     <>
-      <div className="page-head"><div><h1>Alimentazione</h1><p className="muted">Il piano preparato dal tuo trainer.</p></div></div>
-      {!plan ? <p className="empty">Non hai ancora un piano alimentare.</p> : (
+      <div className="page-head"><div><h1>Alimentazione</h1><p className="muted">Segna cosa mangi e consulta il piano del tuo trainer.</p></div></div>
+      <Tabs<"diario" | "piano"> value={tab} onChange={setTab} items={[["diario", "Diario"], ["piano", "Piano"]]} />
+      {tab === "diario" ? <FoodDiary clientId={me.id} editable /> : !plan ? <p className="empty">Non hai ancora un piano alimentare.</p> : (
         <>
           <div className="card" style={{ marginBottom: 16 }}>
             <h2 style={{ marginBottom: 10 }}>{plan.name}</h2>

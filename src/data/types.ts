@@ -119,6 +119,7 @@ export interface AppData {
   appointments: Appointment[];
   foods: Food[];
   mealPlans: MealPlan[];
+  foodLogs: FoodLog[];
   messages: Message[];
 }
 
@@ -205,6 +206,17 @@ export interface MealPlan {
   meals: Meal[];
   createdAt: string;
   updatedAt: string;
+}
+
+/** Diario alimentare: un alimento mangiato dal cliente */
+export interface FoodLog {
+  id: ID;
+  clientId: ID;
+  date: string; // yyyy-mm-dd (giorno locale)
+  meal: string; // Colazione, Pranzo...
+  foodId: ID;
+  grams: number;
+  createdAt: string;
 }
 
 // ---- Messaggi ----

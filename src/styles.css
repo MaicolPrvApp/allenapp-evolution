@@ -255,3 +255,11 @@ table.t td { padding: 7px 8px; border-bottom: 1px solid var(--line); }
 .sheet { width: 100%; background: var(--surface); border-radius: 18px 18px 0 0; padding: 12px 12px max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 2px; }
 .sheet a { display: flex; align-items: center; gap: 12px; padding: 14px 12px; border-radius: 10px; color: var(--fg); text-decoration: none; font-weight: 600; }
 .sheet a.active { background: var(--accent-soft); color: var(--accent); }
+
+/* Diario alimentare: kcal degli ultimi 7 giorni */
+.diary-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.diary-day { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px; border-radius: 8px; border: 1px solid transparent; background: none; color: inherit; min-width: 0; }
+.diary-day.on { border-color: var(--accent); }
+.diary-bar { position: relative; width: 60%; max-width: 26px; height: 80px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.diary-bar i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); }
+.diary-bar b { position: absolute; left: -2px; right: -2px; height: 2px; background: var(--fg); opacity: .7; }

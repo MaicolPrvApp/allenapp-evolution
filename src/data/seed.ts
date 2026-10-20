@@ -1,7 +1,8 @@
-import type { AppData, Appointment, Assessment, Block, BlockItem, Client, Meal, MealPlan, Message, Plan, PlanDay, WorkoutLog } from "./types";
+import type { AppData, Appointment, Assessment, Block, BlockItem, Client, FoodLog, Meal, MealPlan, Message, Plan, PlanDay, WorkoutLog } from "./types";
 import { FOODS } from "./foodLibrary";
 import { LIBRARY } from "./exerciseLibrary";
-import { uid } from "../lib/util";
+import { nowIso, uid } from "../lib/util";
+import { localDate } from "../lib/dates";
 
 // Dati dimostrativi: due clienti, un modello e due schede assegnate con qualche sessione già svolta.
 
@@ -111,7 +112,7 @@ export function createSeed(): AppData {
   [[30, -10], [26, -10], [22, -5], [18, -5], [12, 0], [8, 0], [4, 2.5], [2, 2.5]].forEach(([back, bump], i) => addLog(marco, marcoPlan, i % 3, back, bump));
 
   const extra = createExtras([giulia, marco, sara], iso);
-  return { version: 3, clients: [giulia, marco, sara], exercises: LIBRARY, plans: [template, giuliaPlan, marcoPlan], logs, ...extra };
+  return { version: 4, clients: [giulia, marco, sara], exercises: LIBRARY, plans: [template, giuliaPlan, marcoPlan], logs, ...extra };
 }
 
 /** Dati dimostrativi dei moduli valutazioni, agenda, alimentazione e messaggi */
@@ -168,5 +169,24 @@ export function createExtras(clients: Client[], iso: (daysBack: number) => strin
   );
   if (marco) messages.push({ id: uid(), clientId: marco.id, from: "client", text: "Domani posso spostare la valutazione alle 8?", date: iso(0.1), read: false });
 
-  return { assessments, anamneses, appointments, foods: FOODS, mealPlans, messages };
+  return { assessments, anamneses, appointments, foods: FOODS, mealPlans, foodLogs: createFoodLogs(mealPlans), messages };
+}
+
+/** Diario alimentare di esempio: gli ultimi giorni ricalcano il piano attivo con piccole variazioni */
+export function createFoodLogs(mealPlans: MealPlan[]): FoodLog[] {
+  const out: FoodLog[] = [];
+  const now = Date.now();
+  for (const p of mealPlans) {
+    if (!p.clientId || !p.active) continue;
+    for (const back of [3, 2, 1, 0]) {
+      const date = localDate(new Date(now - back * 86400000).toISOString());
+      const meals = back === 0 ? p.meals.slice(0, 1) : p.meals;
+      meals.forEach((m, mi) => m.items.forEach((it, ii) => {
+        if (back === 2 && mi === meals.length - 1 && ii === 0) return; // un alimento saltato
+        const grams = Math.round(it.grams * (1 + (((back + mi + ii) % 3) - 1) * 0.1));
+        out.push({ id: uid(), clientId: p.clientId!, date, meal: m.name, foodId: it.foodId, grams, createdAt: nowIso() });
+      }));
+    }
+  }
+  return out;
 }

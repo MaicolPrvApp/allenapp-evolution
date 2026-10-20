@@ -21,7 +21,7 @@ Legenda fase: **F1** = nucleo (questa prima anteprima), **F2/F3/F4** = fasi succ
 | Agenda appuntamenti | Calendario con promemoria automatici, collegato alla scheda cliente | Fatto; promemoria automatici F4 |
 | Piani alimentari | Archivio alimenti (900+), piani per pasti, modelli, calcolo macro, invio in app | Fatto (61 alimenti di base + alimenti propri) |
 | Generatore automatico schede | Propone una scheda da obiettivo, livello, giorni e durata | Fatto |
-| Monitoraggio a distanza | Vedere diario allenamenti e alimentare dei clienti | Fatto (allenamenti); diario alimentare F4 |
+| Monitoraggio a distanza | Vedere diario allenamenti e alimentare dei clienti | Fatto (allenamenti e diario alimentare) |
 | Chat e notifiche | Messaggi trainer ↔ cliente, notifiche push | Messaggi fatti; notifiche push con il database online |
 | Pagamenti | Incassi tramite partner esterno | F4 (da decidere) |
 
@@ -34,7 +34,7 @@ Legenda fase: **F1** = nucleo (questa prima anteprima), **F2/F3/F4** = fasi succ
 | Diario allenamenti | Storico delle sessioni svolte | F1 |
 | Progressi | Grafici di carichi e misure | Fatto |
 | Misure personali | Il cliente vede peso e misure | Fatto (inserite dal trainer) |
-| Piano alimentare e diario alimentare | Vedere il piano, registrare i pasti | Piano fatto; diario alimentare F4 |
+| Piano alimentare e diario alimentare | Vedere il piano, registrare i pasti | Fatto (diario con calorie e macro del giorno, confronto con il piano) |
 | Prenotazioni | Prenotare/annullare appuntamenti e lezioni | Fatto |
 | Lezioni live / streaming | Calendario lezioni in diretta | F4 |
 | Chat con il trainer | Messaggi | Fatto |

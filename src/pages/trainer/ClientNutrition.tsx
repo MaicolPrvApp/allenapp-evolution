@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../data/store";
 import type { Client } from "../../data/types";
 import { MacroSummary } from "../../components/MacroSummary";
+import { FoodDiary } from "../../components/FoodDiary";
 import { Icon } from "../../components/Icon";
 import { Modal, toast } from "../../components/ui";
 import { planMacros } from "../../lib/nutrition";
@@ -38,6 +39,8 @@ export function ClientNutrition({ client }: { client: Client }) {
           ))}
         </div>
       ) : <p className="empty">Nessun piano alimentare assegnato.</p>}
+      <h2 style={{ margin: "24px 0 12px" }}>Diario alimentare</h2>
+      <FoodDiary clientId={client.id} editable={false} />
       {pick && (
         <Modal title="Scegli un modello" onClose={() => setPick(false)}>
           {templates.length ? templates.map((t) => (
