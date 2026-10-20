@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AppData, Client, Exercise, ID, Plan, WorkoutLog } from "./types";
-import { createSeed } from "./seed";
+import type { Anamnesis, AppData, Appointment, Assessment, Client, Exercise, Food, FoodLog, ID, MealPlan, Message, Plan, WorkoutLog } from "./types";
+import { createExtras, createFoodLogs, createSeed } from "./seed";
+import { LIBRARY } from "./exerciseLibrary";
 import { nowIso, uid } from "../lib/util";
 
 // Unico punto di accesso ai dati. Oggi salva nel browser (localStorage);
@@ -14,6 +15,17 @@ interface UiState {
   /** Cliente impersonato nell'area cliente (in produzione sarà l'utente autenticato) */
   meId: ID | null;
 }
+
+/** Collezioni con id, gestite dalle azioni generiche save/remove */
+type Collections = {
+  assessments: Assessment;
+  appointments: Appointment;
+  foods: Food;
+  mealPlans: MealPlan;
+  foodLogs: FoodLog;
+  messages: Message;
+};
+type CollName = keyof Collections;
 
 interface Actions {
   setRole(role: Role): void;
@@ -31,6 +43,13 @@ interface Actions {
 
   addLog(l: WorkoutLog): void;
   deleteLog(id: ID): void;
+
+  save<K extends CollName>(coll: K, item: Collections[K]): void;
+  remove(coll: CollName, id: ID): void;
+  saveAnamnesis(a: Anamnesis): void;
+  duplicateMealPlan(id: ID, clientId: ID | null): ID;
+  sendMessage(clientId: ID, from: Message["from"], text: string): void;
+  markRead(clientId: ID, reader: Message["from"]): void;
 
   resetDemo(): void;
   importData(d: AppData): void;
@@ -57,6 +76,12 @@ export const useStore = create<Store>()(
           clients: s.clients.filter((c) => c.id !== id),
           plans: s.plans.filter((p) => p.clientId !== id),
           logs: s.logs.filter((l) => l.clientId !== id),
+          assessments: s.assessments.filter((a) => a.clientId !== id),
+          anamneses: s.anamneses.filter((a) => a.clientId !== id),
+          appointments: s.appointments.filter((a) => a.clientId !== id),
+          mealPlans: s.mealPlans.filter((p) => p.clientId !== id),
+          foodLogs: s.foodLogs.filter((f) => f.clientId !== id),
+          messages: s.messages.filter((m) => m.clientId !== id),
           meId: s.meId === id ? null : s.meId,
         })),
 
@@ -89,20 +114,60 @@ export const useStore = create<Store>()(
       addLog: (l) => set((s) => ({ logs: [...s.logs, l] })),
       deleteLog: (id) => set((s) => ({ logs: s.logs.filter((l) => l.id !== id) })),
 
+      save: (coll, item) => set((s) => ({ [coll]: upsert(s[coll] as { id: ID }[], item) }) as Partial<Store>),
+      remove: (coll, id) => set((s) => ({ [coll]: (s[coll] as { id: ID }[]).filter((x) => x.id !== id) }) as Partial<Store>),
+      saveAnamnesis: (a) =>
+        set((s) => ({ anamneses: [...s.anamneses.filter((x) => x.clientId !== a.clientId), { ...a, updatedAt: nowIso() }] })),
+      duplicateMealPlan: (id, clientId) => {
+        const src = get().mealPlans.find((p) => p.id === id);
+        if (!src) return "";
+        const copy: MealPlan = structuredClone(src);
+        copy.id = uid();
+        copy.clientId = clientId;
+        copy.name = clientId === src.clientId ? `${src.name} (copia)` : src.name;
+        copy.createdAt = copy.updatedAt = nowIso();
+        copy.meals.forEach((m) => { m.id = uid(); m.items.forEach((i) => (i.id = uid())); });
+        set((s) => ({ mealPlans: [...s.mealPlans, copy] }));
+        return copy.id;
+      },
+      sendMessage: (clientId, from, text) =>
+        set((s) => ({ messages: [...s.messages, { id: uid(), clientId, from, text, date: nowIso(), read: false }] })),
+      markRead: (clientId, reader) =>
+        set((s) => ({ messages: s.messages.map((m) => (m.clientId === clientId && m.from !== reader && !m.read ? { ...m, read: true } : m)) })),
+
       resetDemo: () => set({ ...createSeed(), meId: null }),
-      importData: (d) => set({ clients: d.clients, exercises: d.exercises, plans: d.plans, logs: d.logs, meId: null }),
+      importData: (d) => {
+        const empty = { assessments: [], anamneses: [], appointments: [], foods: createSeed().foods, mealPlans: [], foodLogs: [], messages: [] };
+        set({ ...empty, ...d, version: 4, meId: null });
+      },
     }),
-    { name: "kinetika-data", version: 1 }
+    {
+      name: "kinetika-data",
+      version: 4,
+      // la versione 1 non aveva valutazioni, agenda, alimentazione e messaggi: li aggiunge con dati di esempio
+      migrate: (state, from) => {
+        const s = state as Store;
+        if (from < 2) {
+          const now = Date.now();
+          Object.assign(s, createExtras(s.clients ?? [], (b) => new Date(now - b * 86400000).toISOString()), { version: 2 });
+        }
+        if (from < 3) {
+          // aggiunge gli esercizi nuovi dell'archivio di base senza toccare quelli esistenti
+          const have = new Set((s.exercises ?? []).map((e) => e.id));
+          s.exercises = [...(s.exercises ?? []), ...LIBRARY.filter((e) => !have.has(e.id))];
+        }
+        if (from < 4) {
+          // diario alimentare: nuovo, con qualche giorno di esempio per i clienti che hanno un piano
+          s.foodLogs = createFoodLogs(s.mealPlans ?? []);
+        }
+        return s;
+      },
+    }
   )
 );
 
 /** Esporta solo i dati (senza azioni né stato dell'interfaccia) */
 export function exportData(): AppData {
-  const { version, clients, exercises, plans, logs } = useStore.getState();
-  return { version, clients, exercises, plans, logs };
+  const { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, foodLogs, messages } = useStore.getState();
+  return { version, clients, exercises, plans, logs, assessments, anamneses, appointments, foods, mealPlans, foodLogs, messages };
 }
-
-export const useExerciseMap = () => {
-  const exercises = useStore((s) => s.exercises);
-  return new Map(exercises.map((e) => [e.id, e]));
-};

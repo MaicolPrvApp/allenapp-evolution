@@ -1,6 +1,8 @@
-import type { AppData, Block, BlockItem, Client, Plan, PlanDay, WorkoutLog } from "./types";
+import type { AppData, Appointment, Assessment, Block, BlockItem, Client, FoodLog, Meal, MealPlan, Message, Plan, PlanDay, WorkoutLog } from "./types";
+import { FOODS } from "./foodLibrary";
 import { LIBRARY } from "./exerciseLibrary";
-import { uid } from "../lib/util";
+import { nowIso, uid } from "../lib/util";
+import { localDate } from "../lib/dates";
 
 // Dati dimostrativi: due clienti, un modello e due schede assegnate con qualche sessione già svolta.
 
@@ -109,5 +111,82 @@ export function createSeed(): AppData {
   [[20, -5], [17, -5], [13, -2.5], [10, -2.5], [6, 0], [3, 0]].forEach(([back, bump], i) => addLog(giulia, giuliaPlan, i % 2, back, bump));
   [[30, -10], [26, -10], [22, -5], [18, -5], [12, 0], [8, 0], [4, 2.5], [2, 2.5]].forEach(([back, bump], i) => addLog(marco, marcoPlan, i % 3, back, bump));
 
-  return { version: 1, clients: [giulia, marco, sara], exercises: LIBRARY, plans: [template, giuliaPlan, marcoPlan], logs };
+  const extra = createExtras([giulia, marco, sara], iso);
+  return { version: 4, clients: [giulia, marco, sara], exercises: LIBRARY, plans: [template, giuliaPlan, marcoPlan], logs, ...extra };
+}
+
+/** Dati dimostrativi dei moduli valutazioni, agenda, alimentazione e messaggi */
+export function createExtras(clients: Client[], iso: (daysBack: number) => string) {
+  const [giulia, marco, sara] = clients;
+  const day = (daysBack: number) => iso(daysBack).slice(0, 10);
+
+  const assessments: Assessment[] = [];
+  if (giulia) [[56, 64.8, 28, 22, 26], [28, 63.9, 26, 20, 24], [2, 63.1, 24, 18, 22]].forEach(([back, w, tri, sup, cos]) =>
+    assessments.push({ id: uid(), clientId: giulia.id, date: day(back), weight: w, height: 167, restingHr: 64,
+      circ: { vita: 72 - (56 - back) / 14, fianchi: 98 - (56 - back) / 20, braccio: 28, coscia: 56 }, folds: { tricipite: tri, soprailiaca: sup, coscia: cos }, method: "jp3", notes: "" }));
+  if (marco) [[84, 82.5, 14, 22, 15], [42, 83.6, 12, 20, 14], [5, 84.4, 11, 18, 13]].forEach(([back, w, pet, add, cos]) =>
+    assessments.push({ id: uid(), clientId: marco.id, date: day(back), weight: w, height: 180, restingHr: 58,
+      circ: { torace: 104 + (84 - back) / 40, vita: 84, fianchi: 98, braccio: 38 + (84 - back) / 80, coscia: 60 }, folds: { pettorale: pet, addominale: add, coscia: cos }, method: "jp3", notes: "" }));
+
+  const anamneses = giulia ? [{
+    clientId: giulia.id, conditions: "Nessuna", injuries: "Condropatia rotulea ginocchio sinistro (2023), oggi asintomatica.", surgeries: "", medications: "",
+    activity: "moderato" as const, sports: "Corsa 1 volta a settimana", sleepHours: 7, smoker: false, goalsDetail: "Rinforzare gambe e glutei, migliorare la postura.",
+    availability: "Lun, mer, ven dopo le 18", medicalCertificateExpiry: day(-120), consent: true, updatedAt: iso(56),
+  }] : [];
+
+  // agenda: settimana corrente, ore piene
+  const at = (daysAhead: number, h: number) => { const d = new Date(); d.setDate(d.getDate() + daysAhead); d.setHours(h, 0, 0, 0); return d.toISOString(); };
+  const appointments: Appointment[] = [
+    ...(giulia ? [{ id: uid(), clientId: giulia.id, type: "allenamento" as const, start: at(0, 18), durationMin: 60, location: "Sala pesi", notes: "", status: "confermato" as const }] : []),
+    ...(marco ? [{ id: uid(), clientId: marco.id, type: "valutazione" as const, start: at(1, 7), durationMin: 45, location: "Studio", notes: "Plicometria e circonferenze", status: "confermato" as const }] : []),
+    ...(sara ? [{ id: uid(), clientId: sara.id, type: "consulenza" as const, start: at(2, 19), durationMin: 30, location: "Online", notes: "Prima consulenza", status: "richiesto" as const }] : []),
+    { id: uid(), clientId: null, type: "allenamento", start: at(1, 18), durationMin: 60, location: "Sala pesi", notes: "", status: "libero" },
+    { id: uid(), clientId: null, type: "allenamento", start: at(3, 9), durationMin: 60, location: "Sala pesi", notes: "", status: "libero" },
+    { id: uid(), clientId: null, type: "lezione di gruppo", start: at(4, 19), durationMin: 45, location: "Sala corsi", notes: "Circuito funzionale", status: "libero" },
+  ];
+
+  const meal = (name: string, time: string, items: [string, number][]): Meal => ({ id: uid(), name, time, items: items.map(([foodId, grams]) => ({ id: uid(), foodId, grams })) });
+  const marcoMeals: Meal[] = [
+    meal("Colazione", "07:30", [["f-avena", 80], ["f-latte-ps", 250], ["f-banana", 120], ["f-whey", 30]]),
+    meal("Pranzo", "13:00", [["f-riso", 110], ["f-pollo", 180], ["f-zucchine", 200], ["f-olio", 15]]),
+    meal("Spuntino", "16:30", [["f-yogurt-greco", 170], ["f-mandorle", 25], ["f-mela", 150]]),
+    meal("Cena", "20:30", [["f-patate", 300], ["f-salmone", 180], ["f-broccoli", 200], ["f-olio", 10], ["f-pane-int", 60]]),
+  ];
+  const mealPlans: MealPlan[] = [
+    { id: uid(), name: "Ipertrofia 2500 kcal", clientId: marco?.id ?? null, targetKcal: 2500, notes: "Bere almeno 2,5 litri d'acqua. Nei giorni di riposo togliere 40 g di riso a pranzo.", active: true, meals: marcoMeals, createdAt: iso(30), updatedAt: iso(30) },
+    { id: uid(), name: "Base 1800 kcal", clientId: null, targetKcal: 1800, notes: "Modello di partenza per dimagrimento.", active: true, createdAt: iso(60), updatedAt: iso(60), meals: [
+      meal("Colazione", "07:30", [["f-yogurt-greco", 170], ["f-avena", 40], ["f-frutti-bosco", 100]]),
+      meal("Pranzo", "13:00", [["f-pasta-int", 70], ["f-tonno-nat", 120], ["f-pomodori", 150], ["f-olio", 10]]),
+      meal("Spuntino", "16:30", [["f-mela", 150], ["f-noci", 15]]),
+      meal("Cena", "20:00", [["f-merluzzo", 200], ["f-patate", 200], ["f-spinaci", 200], ["f-olio", 10]]),
+    ] },
+  ];
+
+  const messages: Message[] = [];
+  if (giulia) messages.push(
+    { id: uid(), clientId: giulia.id, from: "trainer", text: "Ciao Giulia, da questa settimana aumentiamo lo squat a 42,5 kg se le ultime serie ti sono sembrate facili.", date: iso(4), read: true },
+    { id: uid(), clientId: giulia.id, from: "client", text: "Perfetto! Il ginocchio va bene, nessun fastidio.", date: iso(3), read: false },
+  );
+  if (marco) messages.push({ id: uid(), clientId: marco.id, from: "client", text: "Domani posso spostare la valutazione alle 8?", date: iso(0.1), read: false });
+
+  return { assessments, anamneses, appointments, foods: FOODS, mealPlans, foodLogs: createFoodLogs(mealPlans), messages };
+}
+
+/** Diario alimentare di esempio: gli ultimi giorni ricalcano il piano attivo con piccole variazioni */
+export function createFoodLogs(mealPlans: MealPlan[]): FoodLog[] {
+  const out: FoodLog[] = [];
+  const now = Date.now();
+  for (const p of mealPlans) {
+    if (!p.clientId || !p.active) continue;
+    for (const back of [3, 2, 1, 0]) {
+      const date = localDate(new Date(now - back * 86400000).toISOString());
+      const meals = back === 0 ? p.meals.slice(0, 1) : p.meals;
+      meals.forEach((m, mi) => m.items.forEach((it, ii) => {
+        if (back === 2 && mi === meals.length - 1 && ii === 0) return; // un alimento saltato
+        const grams = Math.round(it.grams * (1 + (((back + mi + ii) % 3) - 1) * 0.1));
+        out.push({ id: uid(), clientId: p.clientId!, date, meal: m.name, foodId: it.foodId, grams, createdAt: nowIso() });
+      }));
+    }
+  }
+  return out;
 }

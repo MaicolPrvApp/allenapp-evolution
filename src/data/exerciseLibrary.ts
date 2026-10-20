@@ -79,6 +79,15 @@ const rows: Row[] = [
   ["ex-ellittica", "Ellittica", "cardio", "cardio", [], "Movimento fluido, busto eretto, usa anche le braccia."],
   ["ex-elastico-row", "Rematore con elastico", "dorso", "elastici", ["bicipiti"], "Elastico fissato davanti, tira verso l'addome stringendo le scapole."],
   ["ex-elastico-squat", "Squat con elastico", "quadricipiti", "elastici", ["glutei"], "Elastico sotto i piedi e sulle spalle, esegui uno squat completo."],
+  // Corpo libero e allenamento a casa
+  ["ex-squat-cl", "Squat a corpo libero", "quadricipiti", "corpo libero", ["glutei"], "Piedi a larghezza spalle, braccia avanti, scendi con il busto alto e risali spingendo sui talloni."],
+  ["ex-jump-squat", "Squat jump", "quadricipiti", "corpo libero", ["glutei", "polpacci"], "Squat seguito da un salto esplosivo, atterra morbido e riparti."],
+  ["ex-affondi-cl", "Affondi alternati a corpo libero", "quadricipiti", "corpo libero", ["glutei"], "Passo avanti, ginocchio dietro verso terra, ritorna e alterna la gamba."],
+  ["ex-wall-sit", "Wall sit", "quadricipiti", "corpo libero", ["glutei"], "Schiena al muro, ginocchia a 90°, mantieni la posizione."],
+  ["ex-pike-pushup", "Pike push up", "spalle", "corpo libero", ["tricipiti"], "Bacino alto a V rovesciata, piega i gomiti portando la testa verso il pavimento."],
+  ["ex-piegamenti-ginocchia", "Piegamenti sulle ginocchia", "petto", "corpo libero", ["tricipiti"], "Come i piegamenti ma con le ginocchia a terra: corpo in linea da ginocchia a spalle."],
+  ["ex-superman", "Superman", "dorso", "corpo libero", ["glutei"], "Prono, solleva insieme braccia e gambe stringendo dorsali e glutei, poi scendi lento."],
+  ["ex-rdl-man", "Stacco rumeno con manubri", "femorali", "manubri", ["glutei", "dorso"], "Manubri davanti alle cosce, spingi indietro le anche con schiena neutra fino a metà tibia."],
 ];
 
 export const LIBRARY: Exercise[] = rows.map(([id, name, muscle, equipment, secondary, description]) => ({
