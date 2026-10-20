@@ -1,6 +1,6 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, MemoryRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { AskDialog, Toaster } from "./components/ui";
+import { AskDialog, Toaster, isFramed } from "./components/ui";
 import { useStore } from "./data/store";
 import { Dashboard } from "./pages/trainer/Dashboard";
 import { Clients } from "./pages/trainer/Clients";
@@ -15,11 +15,14 @@ import { Session } from "./pages/client/Session";
 import { Diary } from "./pages/client/Diary";
 import { Progress } from "./pages/client/Progress";
 
-// HashRouter: funziona su qualsiasi hosting statico (GitHub Pages, anteprime) senza configurare il server.
+// HashRouter: funziona su qualsiasi hosting statico (GitHub Pages) senza configurare il server.
+// Dentro un'anteprima incorporata l'indirizzo non è modificabile, quindi la navigazione resta in memoria.
+const Router = isFramed ? MemoryRouter : HashRouter;
+
 export function App() {
   const role = useStore((s) => s.role);
   return (
-    <HashRouter>
+    <Router>
       <Routes>
         <Route path="/c/sessione/:planId/:dayId" element={<Session />} />
         <Route element={<Layout />}>
@@ -40,6 +43,6 @@ export function App() {
       </Routes>
       <Toaster />
       <AskDialog />
-    </HashRouter>
+    </Router>
   );
 }
