@@ -33,9 +33,10 @@ export function Icon({ name, size = 20 }: { name: keyof typeof P | string; size?
 export function Logo({ size = 34 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 512 512" aria-hidden="true">
-      <rect width="512" height="512" rx="96" fill="#1c1f24" />
-      <circle cx="256" cy="256" r="170" fill="none" stroke="#c5ccd6" strokeWidth="30" />
-      <path d="M86 304c96 72 266 48 350-96" fill="none" stroke="#2f8ff0" strokeWidth="44" strokeLinecap="round" />
+      <rect width="512" height="512" rx="112" fill="#121618" />
+      <path d="M168 120v272" stroke="#ecf2f1" strokeWidth="56" strokeLinecap="round" />
+      <path d="M352 120 214 256l138 136" fill="none" stroke="#2bc3ae" strokeWidth="56" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="380" cy="256" r="34" fill="#2bc3ae" />
     </svg>
   );
 }

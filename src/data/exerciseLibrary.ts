@@ -1,6 +1,6 @@
 import type { Equipment, Exercise, MuscleGroup } from "./types";
 
-// Archivio esercizi di base. Descrizioni brevi scritte per Allenapp.
+// Archivio esercizi di base. Descrizioni brevi scritte per Kinetika.
 type Row = [id: string, name: string, muscle: MuscleGroup, equipment: Equipment, secondary: MuscleGroup[], description: string];
 
 const rows: Row[] = [
