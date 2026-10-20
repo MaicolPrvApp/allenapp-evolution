@@ -1,25 +1,25 @@
-/* Allenapp: interfaccia scura da sala pesi, chiara se il sistema lo chiede.
+/* Kinetika: interfaccia scura da sala pesi, chiara se il sistema lo chiede.
    Desktop: barra laterale. Telefono: barra di navigazione in basso. */
 :root {
-  --bg: #1c1f24; --surface: #262a31; --surface-2: #30353e; --line: #3b414b;
-  --fg: #eef1f5; --muted: #9aa3af; --accent: #2f8ff0; --accent-ink: #fff; --accent-soft: rgba(47,143,240,.16);
+  --bg: #121618; --surface: #1b2124; --surface-2: #242c30; --line: #313b40;
+  --fg: #ecf2f1; --muted: #93a3a1; --accent: #2bc3ae; --accent-ink: #0b1714; --accent-soft: rgba(43,195,174,.15);
   --ok: #3fbf7f; --warn: #f0a63a; --bad: #ef5d5d;
-  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
-  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Saira Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
   --radius: 12px;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #f2f4f7; --surface: #fff; --surface-2: #e8ecf1; --line: #d4dae2;
-    --fg: #1b1f25; --muted: #5b6574; --accent: #1572d3; --accent-soft: rgba(21,114,211,.12);
+    --bg: #f1f5f4; --surface: #fff; --surface-2: #e4ecea; --line: #cfdcd9;
+    --fg: #142020; --muted: #546664; --accent: #0d8a79; --accent-ink: #fff; --accent-soft: rgba(13,138,121,.12);
     --ok: #1f9a5c; --warn: #b8720e; --bad: #c93838; color-scheme: light;
   }
 }
 :root[data-theme="light"] {
-  --bg: #f2f4f7; --surface: #fff; --surface-2: #e8ecf1; --line: #d4dae2;
-  --fg: #1b1f25; --muted: #5b6574; --accent: #1572d3; --accent-soft: rgba(21,114,211,.12);
+  --bg: #f1f5f4; --surface: #fff; --surface-2: #e4ecea; --line: #cfdcd9;
+  --fg: #142020; --muted: #546664; --accent: #0d8a79; --accent-ink: #fff; --accent-soft: rgba(13,138,121,.12);
   --ok: #1f9a5c; --warn: #b8720e; --bad: #c93838; color-scheme: light;
 }
 

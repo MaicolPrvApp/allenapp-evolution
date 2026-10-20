@@ -1,4 +1,4 @@
-# Allenapp
+# Kinetika
 
 Web app per personal trainer, installabile come app su PC e telefono.
 

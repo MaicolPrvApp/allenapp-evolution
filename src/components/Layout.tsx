@@ -59,7 +59,7 @@ export function Layout() {
   return (
     <div className="app">
       <aside className="side">
-        <Link to="/" className="brand"><Logo /><span><b>Allenapp</b><small>{isClientPath ? "Area cliente" : "Area trainer"}</small></span></Link>
+        <Link to="/" className="brand"><Logo /><span><b>Kinetika</b><small>{isClientPath ? "Area cliente" : "Area trainer"}</small></span></Link>
         <div style={{ padding: "0 6px" }}>{roleSwitch}</div>
         <nav className="nav">
           {items.map(([to, label, icon]) => (
@@ -71,7 +71,7 @@ export function Layout() {
       </aside>
       <div className="main">
         <header className="topbar">
-          <Link to="/" className="brand"><Logo size={30} /><b>Allenapp</b></Link>
+          <Link to="/" className="brand"><Logo size={30} /><b>Kinetika</b></Link>
           {roleSwitch}
         </header>
         <div className="content">

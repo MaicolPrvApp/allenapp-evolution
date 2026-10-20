@@ -92,7 +92,7 @@ export const useStore = create<Store>()(
       resetDemo: () => set({ ...createSeed(), meId: null }),
       importData: (d) => set({ clients: d.clients, exercises: d.exercises, plans: d.plans, logs: d.logs, meId: null }),
     }),
-    { name: "allenapp-data", version: 1 }
+    { name: "kinetika-data", version: 1 }
   )
 );
 

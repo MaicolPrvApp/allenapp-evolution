@@ -1,4 +1,4 @@
-# Mappa funzionalità: riferimento EvolutionFit → Allenapp
+# Mappa funzionalità: riferimento EvolutionFit → Kinetika
 
 Ricavata dalle pagine pubbliche del sito di riferimento (software personal trainer, app clienti, archivio esercizi, generatore schede, diete, agenda, versioni e prezzi) e dal loro centro assistenza. Il sito non era raggiungibile direttamente da qui, quindi i dettagli vengono dai testi indicizzati: alcuni punti potrebbero essere cambiati.
 
@@ -39,7 +39,7 @@ Legenda fase: **F1** = nucleo (questa prima anteprima), **F2/F3/F4** = fasi succ
 | Lezioni live / streaming | Calendario lezioni in diretta | F4 |
 | Chat con il trainer | Messaggi | F4 |
 
-## Scelte per Allenapp
+## Scelte per Kinetika
 
 - Nome, logo, testi e grafica propri: si replicano funzioni e flusso, non il marchio.
 - Web app responsive installabile come PWA (PC e telefono).
