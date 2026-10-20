@@ -9,8 +9,11 @@ import { Icon } from "../../components/Icon";
 import { Modal, Tabs, toast, useDraft, ask } from "../../components/ui";
 import { age, fmtDate, fullName, initials } from "../../lib/util";
 import { emptyPlan } from "./newPlan";
+import { ClientAssessments } from "./ClientAssessments";
+import { ClientAnamnesis } from "./ClientAnamnesis";
+import { ClientNutrition } from "./ClientNutrition";
 
-type Tab = "schede" | "diario" | "profilo";
+type Tab = "schede" | "diario" | "valutazioni" | "anamnesi" | "alimentazione" | "profilo";
 
 export function ClientDetail() {
   const { id } = useParams();
@@ -31,11 +34,17 @@ export function ClientDetail() {
             <p className="muted">{[client.goal, client.level, a !== null ? `${a} anni` : ""].filter(Boolean).join(" · ")}</p>
           </div>
         </div>
-        <OpenClientApp id={client.id} />
+        <div className="row">
+          <Link className="btn" to={`/t/messaggi?c=${client.id}`}>Scrivi</Link>
+          <OpenClientApp id={client.id} />
+        </div>
       </div>
-      <Tabs<Tab> value={tab} onChange={(t) => setParams({ tab: t })} items={[["schede", "Schede"], ["diario", "Diario"], ["profilo", "Profilo"]]} />
+      <Tabs<Tab> value={tab} onChange={(t) => setParams({ tab: t })} items={[["schede", "Schede"], ["diario", "Diario"], ["valutazioni", "Valutazioni"], ["anamnesi", "Anamnesi"], ["alimentazione", "Alimentazione"], ["profilo", "Profilo"]]} />
       {tab === "schede" && <ClientPlans client={client} />}
       {tab === "diario" && <ClientDiary id={client.id} />}
+      {tab === "valutazioni" && <ClientAssessments client={client} />}
+      {tab === "anamnesi" && <ClientAnamnesis key={client.id} client={client} />}
+      {tab === "alimentazione" && <ClientNutrition client={client} />}
       {tab === "profilo" && <ClientProfile key={client.id} client={client} />}
     </>
   );

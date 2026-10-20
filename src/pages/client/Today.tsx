@@ -5,6 +5,8 @@ import { activePlanOf, logsOf } from "../../data/selectors";
 import { PlanDayView } from "../../components/PlanDayView";
 import { Icon } from "../../components/Icon";
 import { daysAgo } from "../../lib/util";
+import { Link } from "react-router-dom";
+import { fmtDayLong, fmtTime } from "../../lib/dates";
 import { useMe } from "./useMe";
 
 export function Today() {
@@ -27,6 +29,16 @@ export function Today() {
       <div className="page-head">
         <div><h1>Ciao {me.firstName}</h1><p className="muted">{logs[0] ? `Ultimo allenamento ${daysAgo(logs[0].date)}.` : "Pronto per il primo allenamento?"}</p></div>
       </div>
+      {(() => {
+        const next = store.appointments.filter((a) => a.clientId === me.id && a.status !== "annullato" && new Date(a.start) >= new Date()).sort((a, b) => a.start.localeCompare(b.start))[0];
+        const unread = store.messages.filter((m) => m.clientId === me.id && m.from === "trainer" && !m.read).length;
+        return (next || unread > 0) && (
+          <div className="row" style={{ marginBottom: 16 }}>
+            {next && <Link to="/c/agenda" className="card link tight grow"><span className="muted small">Prossimo appuntamento</span><br /><b style={{ textTransform: "capitalize" }}>{fmtDayLong(new Date(next.start))} · {fmtTime(next.start)}</b> <span className="muted small">{next.type}{next.status === "richiesto" ? " · da confermare" : ""}</span></Link>}
+            {unread > 0 && <Link to="/c/messaggi" className="card link tight"><span className="badge">{unread}</span> <b>nuovi messaggi</b></Link>}
+          </div>
+        );
+      })()}
       {!plan ? (
         <p className="empty">Il tuo trainer non ti ha ancora assegnato una scheda.</p>
       ) : (

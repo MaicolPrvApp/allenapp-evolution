@@ -114,4 +114,106 @@ export interface AppData {
   exercises: Exercise[];
   plans: Plan[];
   logs: WorkoutLog[];
+  assessments: Assessment[];
+  anamneses: Anamnesis[];
+  appointments: Appointment[];
+  foods: Food[];
+  mealPlans: MealPlan[];
+  messages: Message[];
+}
+
+// ---- Valutazioni e anamnesi ----
+
+export type SkinfoldSite = "pettorale" | "ascellare" | "tricipite" | "sottoscapolare" | "addominale" | "soprailiaca" | "coscia";
+export type SkinfoldMethod = "jp3" | "jp7" | "";
+export type Circumference = "torace" | "vita" | "fianchi" | "braccio" | "coscia" | "polpaccio";
+
+export interface Assessment {
+  id: ID;
+  clientId: ID;
+  date: string; // yyyy-mm-dd
+  weight: number | null; // kg
+  height: number | null; // cm
+  restingHr: number | null; // battiti a riposo
+  circ: Partial<Record<Circumference, number>>; // cm
+  folds: Partial<Record<SkinfoldSite, number>>; // mm
+  method: SkinfoldMethod;
+  notes: string;
+}
+
+export interface Anamnesis {
+  clientId: ID;
+  conditions: string; // patologie
+  injuries: string; // infortuni e dolori
+  surgeries: string;
+  medications: string;
+  activity: "sedentario" | "leggero" | "moderato" | "intenso" | "";
+  sports: string;
+  sleepHours: number | null;
+  smoker: boolean;
+  goalsDetail: string;
+  availability: string; // giorni e orari
+  medicalCertificateExpiry: string; // scadenza certificato medico
+  consent: boolean; // consenso al trattamento dei dati
+  updatedAt: string;
+}
+
+// ---- Agenda ----
+
+export type AppointmentType = "allenamento" | "valutazione" | "consulenza" | "lezione di gruppo";
+export type AppointmentStatus = "confermato" | "richiesto" | "annullato" | "libero";
+
+export interface Appointment {
+  id: ID;
+  /** null = posto libero prenotabile dai clienti */
+  clientId: ID | null;
+  type: AppointmentType;
+  start: string; // ISO
+  durationMin: number;
+  location: string;
+  notes: string;
+  status: AppointmentStatus;
+}
+
+// ---- Alimentazione ----
+
+export type FoodCategory = "cereali" | "carne" | "pesce" | "uova e latticini" | "legumi" | "verdura" | "frutta" | "grassi e frutta secca" | "altro";
+
+/** Valori per 100 g */
+export interface Food {
+  id: ID;
+  name: string;
+  category: FoodCategory;
+  kcal: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  custom: boolean;
+}
+
+export interface MealItem { id: ID; foodId: ID; grams: number }
+export interface Meal { id: ID; name: string; time: string; items: MealItem[] }
+
+export interface MealPlan {
+  id: ID;
+  name: string;
+  /** null = modello */
+  clientId: ID | null;
+  targetKcal: number | null;
+  notes: string;
+  active: boolean;
+  meals: Meal[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ---- Messaggi ----
+
+export interface Message {
+  id: ID;
+  clientId: ID;
+  from: "trainer" | "client";
+  text: string;
+  date: string; // ISO
+  read: boolean;
 }
