@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 
 // in alcuni contenitori (anteprime incorporate) anche solo leggere navigator.serviceWorker genera un errore
-if (import.meta.env.PROD) {
+if (import.meta.env.PROD && import.meta.env.MODE !== "preview") {
   addEventListener("load", () => {
     try { navigator.serviceWorker?.register("sw.js").catch(() => {}); } catch { /* non disponibile */ }
   });

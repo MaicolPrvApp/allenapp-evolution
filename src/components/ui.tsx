@@ -128,5 +128,8 @@ export function AskDialog() {
   );
 }
 
-/** true quando l'app gira dentro un'altra pagina (anteprima): niente stampa né video incorporati */
-export const isFramed = (() => { try { return window.self !== window.top; } catch { return true; } })();
+/**
+ * true quando l'app gira dentro un'altra pagina o nella build di anteprima (mode "preview"):
+ * niente stampa, video incorporati né cronologia del browser, che lì sono bloccati.
+ */
+export const isFramed = import.meta.env.MODE === "preview" || (() => { try { return window.self !== window.top; } catch { return true; } })();
